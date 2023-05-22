@@ -1,34 +1,27 @@
 // Import necessary modules
 const express = require("express");
 const cors = require("cors");
-const mysql = require("mysql");
 const bodyParser = require("body-parser");
+const db = require("./db");
+routes = require("./controllers/job-position.controller");
 
 // Create an instance of the Express application
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-// Set up a connection to the MySQL database
-const connection = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "root",
-  database: "proyecto_daw_database",
-});
-
-connection.connect((err) => {
+db.connect((err) => {
   if (err) {
     console.error("Error connecting to MySQL:", err);
     return;
   }
-  console.log("Connected to MySQL database");
+  console.log("Connected to MySQL database with id:", db.threadId);
 });
 
 // API endpoint for fetching data USERS
 app.get("/api/users", (req, res) => {
   // Perform a MySQL query to fetch data from the database
-  connection.query("SELECT * FROM users", (err, results) => {
+  db.query("SELECT * FROM users", (err, results) => {
     if (err) {
       console.error("Error executing MySQL query:", err);
       res.status(500).json({ error: "Internal server error" });
@@ -44,7 +37,7 @@ app.post("/api/users", (req, res) => {
   const { username, email, password } = req.body;
 
   // Perform a MySQL query to insert the data into the database
-  connection.query(
+  db.query(
     "INSERT INTO users (username, email, password) VALUES (?, ?, ?)",
     [username, email, password],
     (err, result) => {
@@ -62,7 +55,7 @@ app.post("/api/users", (req, res) => {
 // API endpoint for fetching data JOB_POSITIONS
 app.get("/api/job-positions", (req, res) => {
   // Perform a MySQL query to fetch data from the database
-  connection.query("SELECT * FROM job_positions", (err, results) => {
+  db.query("SELECT * FROM job_positions", (err, results) => {
     if (err) {
       console.error("Error executing MySQL query:", err);
       res.status(500).json({ error: "Internal server error" });
@@ -90,9 +83,7 @@ app.post("/api/job-positions", (req, res, next) => {
     data.remote,
   ];
 
-  console.log(values);
-
-  connection.query(sql, values, (err, result) => {
+  db.query(sql, values, (err, result) => {
     if (err) {
       console.error("Error inserting data into MySQL:", err);
       res.status(500).json({ error: "An error occurred" });
@@ -102,6 +93,42 @@ app.post("/api/job-positions", (req, res, next) => {
     }
   });
 });
+
+// Endpoint to handle the DELETE request
+app.delete("/api/job-positions/:id", (req, res, next) => {
+  const itemId = req.params.id; // Assuming you have the necessary body-parser middleware to parse JSON
+
+  // Delete item from MySQL
+  const sql = `DELETE FROM job_positions WHERE id = ?`;
+  db.query(sql, [itemId], (err, result) => {
+    if (err) {
+      console.error("Error deleting item from MySQL:", err);
+      res.status(500).send("An error occurred while deleting the item.");
+      return;
+    }
+
+    res.status(200).send("Item deleted successfully!");
+  });
+});
+
+// // DELETE endpoint
+// app.delete("/job-positions/(:id)", (req, res) => {
+//   const jobPositionId = req.params.id;
+
+//   // Delete jobPosition from MySQL
+//   const sql = `DELETE FROM job_positions WHERE id = ?`;
+//   db.query(sql, [jobPositionId], (err, result) => {
+//     if (err) {
+//       console.error("Error deleting jobPosition from MySQL:", err);
+//       res.status(500).send("An error occurred while deleting the jobPosition.");
+//       return;
+//     }
+
+//     res.status(200).send("jobPosition deleted successfully!");
+//   });
+// });
+
+// app.delete();
 
 // Define other API endpoints for updating, deleting, etc.
 
