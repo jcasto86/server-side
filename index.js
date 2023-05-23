@@ -96,18 +96,20 @@ app.post("/api/job-positions", (req, res, next) => {
 
 // Endpoint to handle the DELETE request
 app.delete("/api/job-positions/:id", (req, res, next) => {
-  const itemId = req.params.id; // Assuming you have the necessary body-parser middleware to parse JSON
+  const jobPositionId = req.params.id; // Assuming you have the necessary body-parser middleware to parse JSON
 
-  // Delete item from MySQL
+  // Delete jobPosition from MySQL
   const sql = `DELETE FROM job_positions WHERE id = ?`;
-  db.query(sql, [itemId], (err, result) => {
+  db.query(sql, [jobPositionId], (err, result) => {
     if (err) {
-      console.error("Error deleting item from MySQL:", err);
-      res.status(500).send("An error occurred while deleting the item.");
+      console.error("Error deleting Job Position from MySQL:", err);
+      res
+        .status(500)
+        .send("An error occurred while deleting the Job Position.");
       return;
     }
 
-    res.status(200).send("Item deleted successfully!");
+    res.status(200).send("jobPosition deleted successfully!");
   });
 });
 
