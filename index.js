@@ -113,26 +113,47 @@ app.delete("/api/job-positions/:id", (req, res, next) => {
   });
 });
 
-// // DELETE endpoint
-// app.delete("/job-positions/(:id)", (req, res) => {
-//   const jobPositionId = req.params.id;
+// EDIT JOB POSITION endpoint
 
-//   // Delete jobPosition from MySQL
-//   const sql = `DELETE FROM job_positions WHERE id = ?`;
-//   db.query(sql, [jobPositionId], (err, result) => {
-//     if (err) {
-//       console.error("Error deleting jobPosition from MySQL:", err);
-//       res.status(500).send("An error occurred while deleting the jobPosition.");
-//       return;
-//     }
+app.put("/api/job-positions/:id", (req, res) => {
+  const id = req.params.id;
+  const {
+    logoHref,
+    logoSrc,
+    logoAltText,
+    position,
+    startDate,
+    endDate,
+    city,
+    description,
+    remote,
+  } = req.body;
 
-//     res.status(200).send("jobPosition deleted successfully!");
-//   });
-// });
-
-// app.delete();
-
-// Define other API endpoints for updating, deleting, etc.
+  const query = `UPDATE job_positions SET logoHref = ?, logoSrc = ?, logoAltText = ?, position = ?, startDate = ?, endDate = ?, city = ?, description = ?, remote = ? WHERE id = ?`;
+  db.query(
+    query,
+    [
+      logoHref,
+      logoSrc,
+      logoAltText,
+      position,
+      startDate,
+      endDate,
+      city,
+      description,
+      remote,
+      id,
+    ],
+    (error, results) => {
+      if (error) {
+        console.error("An error occurred while updating the row:", error);
+        res.status(500).json({ error: "Failed to update the row" });
+      } else {
+        res.sendStatus(200);
+      }
+    }
+  );
+});
 
 // Start the server and listen for incoming requests
 const port = 3000; // or any other port number you prefer
