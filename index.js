@@ -155,8 +155,25 @@ app.put("/api/job-positions/:id", (req, res) => {
   );
 });
 
+/**
+ *    ******* SKILLS  *********
+ */
+
+// API endpoint for fetching data JOB_POSITIONS
+app.get("/api/skills", (req, res) => {
+  // Perform a MySQL query to fetch data from the database
+  db.query("SELECT * FROM skills", (err, results) => {
+    if (err) {
+      console.error("Error executing MySQL query:", err);
+      res.status(500).json({ error: "Internal server error" });
+      return;
+    }
+    res.json(results);
+  });
+});
+
 // Start the server and listen for incoming requests
-const port = 3000; // or any other port number you prefer
+const port = 3000;
 app.listen(port, () => {
   console.log(`Server started on port ${port}`);
 });
